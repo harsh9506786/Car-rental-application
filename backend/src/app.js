@@ -18,6 +18,7 @@ app.use(
       "http://localhost:3000",
       "https://car-rental-application-gray.vercel.app",
       "http://13.203.78.132:3000",
+      "http://drivego-app.duckdns.org",
     ],
     credentials: true,
   }),

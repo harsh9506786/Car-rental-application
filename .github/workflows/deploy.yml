@@ -25,7 +25,7 @@ jobs:
 
       - name: Build and push frontend image
         run: |
-          docker build --build-arg NEXT_PUBLIC_API_URL=http://${{ secrets.EC2_HOST }} \
+          docker build --build-arg NEXT_PUBLIC_API_URL=http://drivego-app.duckdns.org \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/drivego-frontend:latest ./frontend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/drivego-frontend:latest
 
