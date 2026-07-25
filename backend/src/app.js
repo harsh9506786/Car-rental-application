@@ -17,8 +17,9 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://car-rental-application-gray.vercel.app",
-      "http://13.203.78.132:3000",
+      "http://13.204.104.139",
       "http://drivego-app.duckdns.org",
+      "https://drivego-app.duckdns.org",
     ],
     credentials: true,
   }),
