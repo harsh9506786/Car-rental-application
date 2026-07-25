@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050505;
+  --surface: #0f0f0f;
+  --card: #151515;
+
+  --text: #ffffff;
+  --muted: #9ca3af;
+
+  --primary: #ff8c42;
+  --primary-hover: #ff7a1a;
+
+  --border: #262626;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #000;
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font-outfit), sans-serif;
+  overflow-x: clip;
+  max-width: 100vw;
+}
+
+.bg-background {
+  background: var(--background);
+}
+
+.bg-surface {
+  background: var(--surface);
+}
+
+.bg-card {
+  background: var(--card);
+}
+
+.text-text {
+  color: var(--text);
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+@keyframes arcMove {
+  0% {
+    transform: rotate(0deg) translateX(0);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: rotate(6deg) translateX(20px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: rotate(0deg) translateX(0);
+    opacity: 0.5;
+  }
+}
+
+@keyframes arcMoveReverse {
+  0% {
+    transform: rotate(0deg) translateX(0);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: rotate(-6deg) translateX(-20px);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: rotate(0deg) translateX(0);
+    opacity: 0.4;
+  }
+}
+
+.animate-arc {
+  animation: arcMove 8s ease-in-out infinite;
+}
+
+.animate-arc-reverse {
+  animation: arcMoveReverse 8s ease-in-out infinite;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+/* Chrome, Edge, Safari */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #fb923c, #ea580c);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #fdba74, #f97316);
+}
+
+/* Firefox */
+
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #f97316 #0b1120;
+}
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(80px);
+  }
+}
+
+@media (max-width: 768px) {
+  body:has(.ai-chat-open) .scroll-top-btn {
+    display: none;
+  }
+}

@@ -1,0 +1,73 @@
+export const cars = [
+  {
+    id: 1,
+    name: "Toyota Corolla",
+    category: "Compact Sedan",
+    price: "₹3000/day",
+    image: "/cars/car1.jpg",
+    seats: 5,
+    fuel: "Gasoline",
+    mileage: "30 MPG",
+    transmission: "Automatic",
+  },
+
+  {
+    id: 2,
+    name: "Honda Civic",
+    category: "Compact Sedan",
+    price: "₹2500/day",
+    image: "/cars/car2.jpg",
+    seats: 5,
+    fuel: "Gasoline",
+    mileage: "32 MPG",
+    transmission: "Automatic",
+  },
+
+  {
+    id: 3,
+    name: "Volkswagen Golf",
+    category: "Hatchback",
+    price: "₹5000/day",
+    image: "/cars/car3.jpg",
+    seats: 5,
+    fuel: "Gasoline",
+    mileage: "29 MPG",
+    transmission: "Manual",
+  },
+
+  {
+    id: 4,
+    name: "Hyundai Elantra",
+    category: "Compact Sedan",
+    price: "₹2000/day",
+    image: "/cars/car4.jpg",
+    seats: 5,
+    fuel: "Gasoline",
+    mileage: "33 MPG",
+    transmission: "Automatic",
+  },
+
+  {
+    id: 5,
+    name: "BMW M4",
+    category: "Sports",
+    price: "₹9000/day",
+    image: "/cars/car5.jpg",
+    seats: 4,
+    fuel: "Petrol",
+    mileage: "18 MPG",
+    transmission: "Automatic",
+  },
+
+  {
+    id: 6,
+    name: "Mercedes C-Class",
+    category: "Luxury",
+    price: "₹7000/day",
+    image: "/cars/car6.jpg",
+    seats: 5,
+    fuel: "Petrol",
+    mileage: "24 MPG",
+    transmission: "Automatic",
+  },
+];
