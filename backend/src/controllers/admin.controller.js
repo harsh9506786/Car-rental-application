@@ -1,9 +1,16 @@
 import Car from "../models/Car.js";
 import Booking from "../models/Booking.js";
 import User from "../models/User.js";
+import { autoExpireBookings } from "../utils/autoExpireBookings.js";
+import { sendBookingConfirmed } from "../services/whatsapp.service.js";
+
+const ACTIVE_STATUSES = ["Pending", "Confirmed"];
+const HISTORY_STATUSES = ["Completed", "Cancelled"];
 
 export const getDashboardStats = async (req, res) => {
   try {
+    await autoExpireBookings();
+
     const totalCars = await Car.countDocuments();
     const totalBookings = await Booking.countDocuments();
     const totalUsers = await User.countDocuments();
@@ -26,6 +33,8 @@ export const getDashboardStats = async (req, res) => {
 
 export const getRecentBookings = async (req, res) => {
   try {
+    await autoExpireBookings();
+
     const bookings = await Booking.find()
       .populate("user", "name email")
       .populate("car", "name")
@@ -69,7 +78,15 @@ export const updateBookingStatus = async (req, res) => {
         status: req.body.status,
       },
       { new: true },
-    );
+    ).populate("car", "name brand");
+
+    if (booking && req.body.status === "Confirmed") {
+      sendBookingConfirmed({
+        phone: booking.phone,
+        carName: booking.car?.name || "your car",
+        pickupDate: booking.pickupDate,
+      });
+    }
 
     res.json({
       success: true,
@@ -85,10 +102,37 @@ export const updateBookingStatus = async (req, res) => {
 
 export const getAllBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find()
+    await autoExpireBookings();
+
+    const bookings = await Booking.find({
+      status: { $in: ACTIVE_STATUSES },
+    })
       .populate("user", "name email")
       .populate("car", "name brand")
       .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      bookings,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getBookingHistory = async (req, res) => {
+  try {
+    await autoExpireBookings();
+
+    const bookings = await Booking.find({
+      status: { $in: HISTORY_STATUSES },
+    })
+      .populate("user", "name email")
+      .populate("car", "name brand")
+      .sort({ returnDate: -1 });
 
     res.json({
       success: true,

@@ -10,20 +10,33 @@ const userSchema = new mongoose.Schema(
 
     email: {
       type: String,
-      required: true,
       unique: true,
+      sparse: true,
       lowercase: true,
       trim: true,
     },
 
     password: {
       type: String,
-      required: true,
     },
 
     phone: {
       type: String,
-      default: "",
+      unique: true,
+      sparse: true,
+      default: undefined,
+    },
+
+    firebaseUid: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    authProvider: {
+      type: String,
+      enum: ["email", "google"],
+      default: "email",
     },
 
     avatar: {
