@@ -1,4 +1,7 @@
+"use client";
+
 import SignupForm from "./SignupForm";
+import GoogleSignInButton from "./GoogleSignInButton";
 
 export default function SignupCard() {
   return (
@@ -36,8 +39,22 @@ export default function SignupCard() {
         </p>
       </div>
 
-      <div className="mt-12">
+      <div className="relative z-10 mt-10">
         <SignupForm />
+      </div>
+
+      {/* Divider */}
+      <div className="relative z-10 my-6 flex items-center gap-4">
+        <div className="h-px flex-1 bg-gray-700" />
+        <span className="text-xs uppercase tracking-widest text-gray-500">
+          Or
+        </span>
+        <div className="h-px flex-1 bg-gray-700" />
+      </div>
+
+      {/* Google Sign-In */}
+      <div className="relative z-10">
+        <GoogleSignInButton />
       </div>
     </div>
   );
