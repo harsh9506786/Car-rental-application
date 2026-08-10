@@ -1,5 +1,7 @@
-import Image from "next/image";
-import LoginForm from "./LoginForm"
+"use client";
+
+import LoginForm from "./LoginForm";
+import GoogleSignInButton from "./GoogleSignInButton";
 
 export default function LoginCard() {
   return (
@@ -26,18 +28,6 @@ export default function LoginCard() {
 
       {/* Logo */}
       <div className="flex flex-col items-center">
-
-        {/* Agar logo image hai to yaha use karo */}
-        {/*
-        <Image
-          src="/logo.png"
-          alt="KarZone"
-          width={170}
-          height={55}
-        />
-        */}
-
-        {/* Temporary Logo */}
         <h1 className="text-5xl font-extrabold tracking-wider">
           <span className="text-white">DRIVE</span>
           <span className="text-orange-500">GO</span>
@@ -53,8 +43,22 @@ export default function LoginCard() {
       </div>
 
       {/* Form */}
-      <div className="mt-12">
+      <div className="relative z-10 mt-10">
         <LoginForm />
+      </div>
+
+      {/* Divider */}
+      <div className="relative z-10 my-6 flex items-center gap-4">
+        <div className="h-px flex-1 bg-gray-700" />
+        <span className="text-xs uppercase tracking-widest text-gray-500">
+          Or
+        </span>
+        <div className="h-px flex-1 bg-gray-700" />
+      </div>
+
+      {/* Google Sign-In */}
+      <div className="relative z-10">
+        <GoogleSignInButton />
       </div>
     </div>
   );

@@ -1,5 +1,22 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+
 export default function FullScreenLoader() {
-  return (
+  // Rendering via a portal into document.body escapes any ancestor with
+  // backdrop-filter/filter/transform - those CSS properties create a new
+  // "containing block" for position:fixed children, which traps the
+  // overlay inside that ancestor instead of covering the full viewport.
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm">
       <div
         className="
@@ -12,6 +29,7 @@ export default function FullScreenLoader() {
           border-t-orange-400
         "
       />
-    </div>
+    </div>,
+    document.body,
   );
 }

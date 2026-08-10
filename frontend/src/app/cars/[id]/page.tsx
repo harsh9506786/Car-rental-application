@@ -23,6 +23,8 @@ export default function CarDetailsPage() {
     notes: "",
   });
 
+  const todayStr = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     if (id) {
       fetchCar();
@@ -213,6 +215,7 @@ export default function CarDetailsPage() {
                   <input
                     type="date"
                     name="pickupDate"
+                    min={todayStr}
                     value={booking.pickupDate}
                     onChange={handleChange}
                     className="w-full rounded-lg border border-gray-700 bg-[#1a2333] px-3 py-3 text-sm text-white outline-none focus:border-orange-500"
@@ -225,6 +228,7 @@ export default function CarDetailsPage() {
                   <input
                     type="date"
                     name="returnDate"
+                    min={booking.pickupDate || todayStr}
                     value={booking.returnDate}
                     onChange={handleChange}
                     className="w-full rounded-lg border border-gray-700 bg-[#1a2333] px-3 py-3 text-sm text-white outline-none focus:border-orange-500"

@@ -2,10 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { Calendar, MapPin, Phone, PackageOpen, Car as CarIcon } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Calendar,
+  MapPin,
+  Phone,
+  PackageOpen,
+  Car as CarIcon,
+  Pencil,
+  History,
+  Clock,
+  CreditCard,
+} from "lucide-react";
 import api from "@/lib/axios";
 import BookingCardSkeleton from "@/components/bookings/BookingCardSkeleton";
+import EditBookingModal from "@/components/bookings/EditBookingModal";
+import PaymentModal from "@/components/bookings/PaymentModal";
 
 type Booking = {
   _id: string;
@@ -23,6 +35,7 @@ type Booking = {
   phone: string;
   notes?: string;
   status: "Pending" | "Confirmed" | "Completed" | "Cancelled";
+  paymentStatus: "Unpaid" | "Paid";
 };
 
 const statusStyles: Record<string, string> = {
@@ -31,6 +44,8 @@ const statusStyles: Record<string, string> = {
   Completed: "bg-blue-500/10 text-blue-400 border-blue-500/30",
   Cancelled: "bg-red-500/10 text-red-400 border-red-500/30",
 };
+
+const EDITABLE_STATUSES = ["Pending", "Confirmed"];
 
 function BookingImage({ src, alt }: { src?: string; alt: string }) {
   const [failed, setFailed] = useState(false);
@@ -54,9 +69,21 @@ function BookingImage({ src, alt }: { src?: string; alt: string }) {
   );
 }
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 export default function MyBookingsPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [token, setToken] = useState<string | null>(null);
+  const [tab, setTab] = useState<"active" | "history">("active");
+  const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
+  const [payingBooking, setPayingBooking] = useState<Booking | null>(null);
 
   useEffect(() => {
     const t = localStorage.getItem("token");
@@ -69,8 +96,8 @@ export default function MyBookingsPage() {
     setToken(t);
   }, []);
 
-  const fetchBookings = async () => {
-    const res = await api.get("/api/bookings", {
+  const fetchBookings = async (endpoint: string) => {
+    const res = await api.get(endpoint, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -80,22 +107,67 @@ export default function MyBookingsPage() {
   };
 
   const {
-    data: bookings = [],
-    isLoading,
-    isError,
+    data: activeBookings = [],
+    isLoading: isActiveLoading,
+    isError: isActiveError,
   } = useQuery({
-    queryKey: ["my-bookings"],
-    queryFn: fetchBookings,
+    queryKey: ["my-bookings", "active"],
+    queryFn: () => fetchBookings("/api/bookings"),
     enabled: !!token,
     staleTime: 1000 * 60 * 2,
   });
 
+  const {
+    data: historyBookings = [],
+    isLoading: isHistoryLoading,
+    isError: isHistoryError,
+  } = useQuery({
+    queryKey: ["my-bookings", "history"],
+    queryFn: () => fetchBookings("/api/bookings/history"),
+    enabled: !!token && tab === "history",
+    staleTime: 1000 * 60 * 2,
+  });
+
+  const isLoading = tab === "active" ? isActiveLoading : isHistoryLoading;
+  const isError = tab === "active" ? isActiveError : isHistoryError;
+  const bookings = tab === "active" ? activeBookings : historyBookings;
+
+  const handleUpdated = () => {
+    queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+  };
+
   return (
     <main className="min-h-screen bg-[#030712] py-10">
       <div className="mx-auto w-full max-w-5xl px-6 pt-20 sm:px-8 lg:px-12">
-        <h1 className="mb-8 text-3xl font-bold text-white">
+        <h1 className="mb-6 text-3xl font-bold text-white">
           My <span className="text-orange-500">Bookings</span>
         </h1>
+
+        {/* Tabs */}
+        <div className="mb-8 inline-flex rounded-xl border border-[#1f2937] bg-[#111827] p-1">
+          <button
+            onClick={() => setTab("active")}
+            className={`flex items-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold transition ${
+              tab === "active"
+                ? "bg-gradient-to-r from-orange-500 to-orange-400 text-white"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            <Clock size={16} />
+            Active
+          </button>
+          <button
+            onClick={() => setTab("history")}
+            className={`flex items-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold transition ${
+              tab === "history"
+                ? "bg-gradient-to-r from-orange-500 to-orange-400 text-white"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            <History size={16} />
+            History
+          </button>
+        </div>
 
         {isLoading && (
           <div className="space-y-5">
@@ -115,17 +187,23 @@ export default function MyBookingsPage() {
           <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-[#1f2937] bg-[#111827] py-20 text-center">
             <PackageOpen size={48} className="text-gray-600" />
             <p className="text-lg font-medium text-white">
-              You have no bookings yet
+              {tab === "active"
+                ? "You have no active bookings"
+                : "No booking history yet"}
             </p>
             <p className="text-sm text-gray-400">
-              Browse our cars and book your first ride.
+              {tab === "active"
+                ? "Browse our cars and book your first ride."
+                : "Completed or cancelled bookings will show up here."}
             </p>
-            <button
-              onClick={() => router.push("/cars")}
-              className="mt-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 px-6 py-3 font-semibold text-white transition hover:scale-[1.02]"
-            >
-              Explore Cars
-            </button>
+            {tab === "active" && (
+              <button
+                onClick={() => router.push("/cars")}
+                className="mt-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 px-6 py-3 font-semibold text-white transition hover:scale-[1.02]"
+              >
+                Explore Cars
+              </button>
+            )}
           </div>
         )}
 
@@ -153,29 +231,49 @@ export default function MyBookingsPage() {
                       </p>
                     </div>
 
-                    <span
-                      className={`rounded-full border px-4 py-1.5 text-xs font-semibold ${
-                        statusStyles[booking.status] ||
-                        "border-gray-600 bg-gray-500/10 text-gray-300"
-                      }`}
-                    >
-                      {booking.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`rounded-full border px-4 py-1.5 text-xs font-semibold ${
+                          statusStyles[booking.status] ||
+                          "border-gray-600 bg-gray-500/10 text-gray-300"
+                        }`}
+                      >
+                        {booking.status}
+                      </span>
+
+                      {tab === "active" &&
+                        booking.status === "Confirmed" &&
+                        booking.paymentStatus === "Unpaid" && (
+                          <button
+                            onClick={() => setPayingBooking(booking)}
+                            title="Pay now"
+                            className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 px-3 py-1.5 text-xs font-semibold text-white transition hover:scale-[1.03]"
+                          >
+                            <CreditCard size={13} />
+                            Pay Now
+                          </button>
+                        )}
+
+                      {tab === "active" &&
+                        EDITABLE_STATUSES.includes(booking.status) && (
+                          <button
+                            onClick={() => setEditingBooking(booking)}
+                            title="Edit booking"
+                            className="flex items-center gap-1.5 rounded-full border border-[#1f2937] bg-[#1a2333] px-3 py-1.5 text-xs font-semibold text-gray-300 transition hover:border-orange-500/50 hover:text-orange-400"
+                          >
+                            <Pencil size={13} />
+                            Edit
+                          </button>
+                        )}
+                    </div>
                   </div>
 
                   <div className="mt-4 grid grid-cols-1 gap-3 text-sm text-gray-300 sm:grid-cols-3">
                     <div className="flex items-center gap-2">
                       <Calendar size={16} className="text-orange-500" />
                       <span>
-                        {new Date(booking.pickupDate).toLocaleDateString(
-                          "en-IN",
-                          { day: "numeric", month: "short", year: "numeric" },
-                        )}{" "}
-                        →{" "}
-                        {new Date(booking.returnDate).toLocaleDateString(
-                          "en-IN",
-                          { day: "numeric", month: "short", year: "numeric" },
-                        )}
+                        {formatDate(booking.pickupDate)} →{" "}
+                        {formatDate(booking.returnDate)}
                       </span>
                     </div>
 
@@ -195,9 +293,16 @@ export default function MyBookingsPage() {
                       {booking.totalDays}{" "}
                       {booking.totalDays === 1 ? "day" : "days"}
                     </span>
-                    <span className="text-lg font-bold text-white">
-                      ₹{booking.totalPrice.toLocaleString("en-IN")}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {booking.paymentStatus === "Paid" && (
+                        <span className="rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-1 text-[10px] font-semibold text-green-400">
+                          PAID
+                        </span>
+                      )}
+                      <span className="text-lg font-bold text-white">
+                        ₹{booking.totalPrice.toLocaleString("en-IN")}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -205,6 +310,18 @@ export default function MyBookingsPage() {
           </div>
         )}
       </div>
+
+      <EditBookingModal
+        booking={editingBooking}
+        onClose={() => setEditingBooking(null)}
+        onUpdated={handleUpdated}
+      />
+
+      <PaymentModal
+        booking={payingBooking}
+        onClose={() => setPayingBooking(null)}
+        onPaid={handleUpdated}
+      />
     </main>
   );
 }

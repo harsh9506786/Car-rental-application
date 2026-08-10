@@ -6,10 +6,12 @@ import Link from "next/link";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import api from "@/lib/axios";
 import FullScreenLoader from "@/components/ui/FullScreenLoader";
+import { useToast } from "@/context/ToastContext";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [email, setEmail] = useState("");
 
@@ -20,9 +22,9 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
+    try {
       const response = await api.post("/api/auth/login", {
         email,
         password,
@@ -40,7 +42,13 @@ export default function LoginForm() {
         router.push("/");
       }
     } catch (error: any) {
-      alert(error.response?.data?.message || "Login Failed");
+      showToast(
+        "error",
+        "Login Failed",
+        error.response?.data?.message || "Please check your credentials and try again.",
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
