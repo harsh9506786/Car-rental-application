@@ -25,10 +25,14 @@ jobs:
 
       - name: Build and push frontend image
         run: |
-          docker build --build-arg NEXT_PUBLIC_API_URL=https://drivego-app.duckdns.org \
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=https://drivego-app.duckdns.org \
+            --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }} \
+            --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }} \
+            --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }} \
+            --build-arg NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/drivego-frontend:latest ./frontend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/drivego-frontend:latest
-
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/drivego-frontend:latest 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1
         with:
