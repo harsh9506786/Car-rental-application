@@ -6,11 +6,13 @@ import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import api from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import FullScreenLoader from "@/components/ui/FullScreenLoader";
+import { useToast } from "@/context/ToastContext";
 
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -22,13 +24,13 @@ export default function SignupForm() {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      showToast("warning", "Passwords Don't Match", "Please make sure both passwords are the same.");
       return;
     }
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
+    try {
       const response = await api.post("/api/auth/signup", {
         name,
         email,
@@ -46,9 +48,13 @@ export default function SignupForm() {
         router.push("/");
       }
     } catch (error: any) {
+      showToast(
+        "error",
+        "Signup Failed",
+        error.response?.data?.message || "Something went wrong. Please try again.",
+      );
+    } finally {
       setLoading(false);
-
-      alert(error.response?.data?.message || "Signup Failed");
     }
   };
 
