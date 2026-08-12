@@ -3,6 +3,7 @@
 import api from "@/lib/axios";
 import StatCard from "@/components/admin/StatCard";
 import DashboardSkeleton from "@/components/admin/DashboardSkeleton";
+import { useToast } from "@/context/ToastContext";
 
 import { Car, CalendarDays, Users, IndianRupee } from "lucide-react";
 
@@ -13,6 +14,7 @@ import {
 
 export default function AdminDashboard() {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const fetchDashboard = async () => {
     const token = localStorage.getItem("token");
@@ -68,8 +70,18 @@ export default function AdminDashboard() {
           ),
         };
       });
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+
+      showToast(
+        "error",
+        "Could Not Update Status",
+        error?.response?.data?.message || "Something went wrong. Please try again.",
+      );
+
+      // Re-sync with server in case this booking's status is now stale
+      // (e.g. it was already finalized by another admin/action)
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     }
   };
 
@@ -177,28 +189,44 @@ export default function AdminDashboard() {
                   </td>
 
                   <td>
-                    <select
-                      value={booking.status}
-                      onChange={(e) =>
-                        updateStatus(
-                          booking._id,
-                          e.target.value,
-                        )
-                      }
-                      className="rounded-lg border border-slate-700 bg-[#1F2937] px-3 py-2 text-sm text-white outline-none focus:border-orange-500"
-                    >
-                      <option value="Pending">
-                        Pending
-                      </option>
+                    {["Completed", "Cancelled"].includes(booking.status) ? (
+                      <span
+                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                          booking.status === "Completed"
+                            ? "border-blue-500/30 bg-blue-500/10 text-blue-400"
+                            : "border-red-500/30 bg-red-500/10 text-red-400"
+                        }`}
+                      >
+                        {booking.status}
+                      </span>
+                    ) : (
+                      <select
+                        value={booking.status}
+                        onChange={(e) =>
+                          updateStatus(
+                            booking._id,
+                            e.target.value,
+                          )
+                        }
+                        className="rounded-lg border border-slate-700 bg-[#1F2937] px-3 py-2 text-sm text-white outline-none focus:border-orange-500"
+                      >
+                        <option value="Pending">
+                          Pending
+                        </option>
 
-                      <option value="Approved">
-                        Approved
-                      </option>
+                        <option value="Confirmed">
+                          Confirmed
+                        </option>
 
-                      <option value="Completed">
-                        Completed
-                      </option>
-                    </select>
+                        <option value="Completed">
+                          Completed
+                        </option>
+
+                        <option value="Cancelled">
+                          Cancelled
+                        </option>
+                      </select>
+                    )}
                   </td>
                 </tr>
               ))}

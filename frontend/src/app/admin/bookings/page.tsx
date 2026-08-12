@@ -5,6 +5,7 @@ import api from "@/lib/axios";
 import TableSkeleton from "@/components/admin/TableSkeleton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Clock, History } from "lucide-react";
+import { useToast } from "@/context/ToastContext";
 
 const statusStyles: Record<string, string> = {
   Pending: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/30",
@@ -15,6 +16,7 @@ const statusStyles: Record<string, string> = {
 
 export default function BookingsPage() {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const [updatingId, setUpdatingId] = useState("");
   const [tab, setTab] = useState<"active" | "history">("active");
 
@@ -75,8 +77,14 @@ export default function BookingsPage() {
 
       // Completed/Cancelled bookings move to history, so refresh both lists
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
-    } catch (err) {
+    } catch (err: any) {
       console.log(err);
+
+      showToast(
+        "error",
+        "Could Not Update Status",
+        err?.response?.data?.message || "Something went wrong. Please try again.",
+      );
 
       // Rollback if API fails
       queryClient.setQueryData(["admin-bookings", "active"], previousBookings);
@@ -118,8 +126,8 @@ export default function BookingsPage() {
       {isLoading ? (
         <TableSkeleton rows={6} columns={5} />
       ) : (
-        <div className="overflow-x-auto rounded-2xl bg-[#111827] p-6">
-          <table className="w-full text-left">
+        <div className="-mx-4 overflow-x-auto rounded-2xl bg-[#111827] p-4 sm:mx-0 sm:p-6">
+          <table className="w-full min-w-[720px] text-left">
             <thead>
               <tr className="border-b border-gray-700 text-gray-400">
                 <th className="pb-4">Customer</th>

@@ -17,10 +17,7 @@ export default function UsersPage() {
     return res.data.users;
   };
 
-  const {
-    data: users = [],
-    isLoading,
-  } = useQuery({
+  const { data: users = [], isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: fetchUsers,
     staleTime: 1000 * 60 * 5, // 5 min
@@ -34,8 +31,8 @@ export default function UsersPage() {
     <div>
       <h1 className="mb-8 text-3xl font-bold text-white">Users</h1>
 
-      <div className="overflow-x-auto rounded-2xl bg-[#111827] p-6">
-        <table className="w-full text-left">
+      <div className="-mx-4 overflow-x-auto rounded-2xl bg-[#111827] p-4 sm:mx-0 sm:p-6">
+        <table className="w-full min-w-[720px] text-left">
           <thead>
             <tr className="border-b border-gray-700 text-gray-400">
               <th className="pb-4">Name</th>
@@ -53,9 +50,7 @@ export default function UsersPage() {
 
                 <td className="py-4 text-gray-300">{user.email}</td>
 
-                <td className="py-4 text-gray-300">
-                  {user.phone || "-"}
-                </td>
+                <td className="py-4 text-gray-300">{user.phone || "-"}</td>
 
                 <td className="py-4">
                   <span
