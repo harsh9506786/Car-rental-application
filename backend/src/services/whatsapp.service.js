@@ -17,6 +17,25 @@ const client =
     ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
     : null;
 
+// Cleans a phone number into E.164 format (e.g. +919876543210).
+// Handles numbers typed with spaces, dashes, or an already-included
+// country code, all of which would otherwise silently produce a
+// malformed "to" address that Twilio rejects.
+const formatPhone = (rawPhone) => {
+  const digitsOnly = rawPhone.replace(/[^\d+]/g, "");
+
+  if (digitsOnly.startsWith("+")) {
+    return digitsOnly;
+  }
+
+  // Already has the country code but missing the +
+  if (digitsOnly.startsWith("91") && digitsOnly.length === 12) {
+    return `+${digitsOnly}`;
+  }
+
+  return `+91${digitsOnly}`;
+};
+
 export const sendBookingConfirmation = async ({
   phone,
   carName,
@@ -32,7 +51,11 @@ export const sendBookingConfirmation = async ({
   }
 
   try {
-    const formattedPhone = phone.startsWith("+") ? phone : `+91${phone}`;
+    const formattedPhone = formatPhone(phone);
+    const fromNumber = `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`;
+    const toNumber = `whatsapp:${formattedPhone}`;
+
+    console.log(`[whatsapp] Attempting send from ${fromNumber} to ${toNumber} (raw input: "${phone}")`);
 
     const pickup = new Date(pickupDate).toLocaleString("en-IN", {
       day: "numeric",
@@ -50,9 +73,9 @@ export const sendBookingConfirmation = async ({
       minute: "2-digit",
     });
 
-    await client.messages.create({
-      from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
-      to: `whatsapp:${formattedPhone}`,
+    const message = await client.messages.create({
+      from: fromNumber,
+      to: toNumber,
       body:
         `🚗 *Your car is booked!*\n\n` +
         `Car: ${carName}\n` +
@@ -61,6 +84,8 @@ export const sendBookingConfirmation = async ({
         `Total: ₹${totalPrice}\n\n` +
         `We'll notify you once it's confirmed by our team.`,
     });
+
+    console.log(`[whatsapp] Sent successfully. SID: ${message.sid}, status: ${message.status}`);
   } catch (error) {
     // Never let a notification failure break the booking flow
     console.log("[whatsapp] Failed to send message:", error.message);
@@ -75,7 +100,11 @@ export const sendBookingConfirmed = async ({
   if (!client) return;
 
   try {
-    const formattedPhone = phone.startsWith("+") ? phone : `+91${phone}`;
+    const formattedPhone = formatPhone(phone);
+    const fromNumber = `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`;
+    const toNumber = `whatsapp:${formattedPhone}`;
+
+    console.log(`[whatsapp] Attempting send from ${fromNumber} to ${toNumber} (raw input: "${phone}")`);
 
     const pickup = new Date(pickupDate).toLocaleString("en-IN", {
       day: "numeric",
@@ -85,14 +114,16 @@ export const sendBookingConfirmed = async ({
       minute: "2-digit",
     });
 
-    await client.messages.create({
-      from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
-      to: `whatsapp:${formattedPhone}`,
+    const message = await client.messages.create({
+      from: fromNumber,
+      to: toNumber,
       body:
         `✅ *Booking Confirmed!*\n\n` +
         `Your ${carName} booking is confirmed for pickup on ${pickup}. ` +
         `Please complete the payment from your dashboard to finalize it.`,
     });
+
+    console.log(`[whatsapp] Sent successfully. SID: ${message.sid}, status: ${message.status}`);
   } catch (error) {
     console.log("[whatsapp] Failed to send message:", error.message);
   }
