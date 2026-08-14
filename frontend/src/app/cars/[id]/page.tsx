@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { ArrowLeft, Users, Fuel, Gauge, ShieldCheck } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
@@ -11,8 +12,6 @@ export default function CarDetailsPage() {
   const { id } = useParams();
 
   const { showToast } = useToast();
-  const [car, setCar] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
 
   const [booking, setBooking] = useState({
@@ -25,23 +24,20 @@ export default function CarDetailsPage() {
 
   const todayStr = new Date().toISOString().split("T")[0];
 
-  useEffect(() => {
-    if (id) {
-      fetchCar();
-    }
-  }, [id]);
-
   const fetchCar = async () => {
-    try {
-      const res = await api.get(`/api/cars/${id}`);
-
-      setCar(res.data.car);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
+    const res = await api.get(`/api/cars/${id}`);
+    return res.data.car;
   };
+
+  const {
+    data: car,
+    isLoading: loading,
+  } = useQuery({
+    queryKey: ["car", id],
+    queryFn: fetchCar,
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
 
   if (loading) {
     return (
@@ -65,8 +61,8 @@ export default function CarDetailsPage() {
     { icon: Gauge, label: "Mileage", value: car.mileage },
     { icon: ShieldCheck, label: "Transmission", value: car.transmission },
   ];
+
   const handleBooking = async () => {
-    // 👇 Validation yaha
     if (
       !booking.pickupDate ||
       !booking.returnDate ||
@@ -117,7 +113,7 @@ export default function CarDetailsPage() {
       });
 
       setTimeout(() => {
-        router.back();
+        router.push("/my-bookings");
       }, 1000);
     } catch (error: any) {
       console.log(error.response?.data || error);

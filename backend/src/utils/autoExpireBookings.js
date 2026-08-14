@@ -12,16 +12,10 @@ import Booking from "../models/Booking.js";
 export const autoExpireBookings = async () => {
   const now = new Date();
 
-  await Promise.all([
-    Booking.updateMany(
-      { status: "Confirmed", returnDate: { $lt: now } },
-      { $set: { status: "Completed" } },
-    ),
-    Booking.updateMany(
-      { status: "Pending", returnDate: { $lt: now } },
-      { $set: { status: "Cancelled" } },
-    ),
-  ]);
+  await Booking.updateMany(
+    { status: "Confirmed", returnDate: { $lt: now } },
+    { $set: { status: "Completed" } },
+  );
 };
 
 export default autoExpireBookings;

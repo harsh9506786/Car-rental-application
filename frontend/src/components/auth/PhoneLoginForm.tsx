@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Phone, ShieldCheck, User } from "lucide-react";
 import {
   RecaptchaVerifier,
@@ -21,6 +21,8 @@ declare global {
 
 export default function PhoneLoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const { showToast } = useToast();
 
   const [step, setStep] = useState<"phone" | "otp">("phone");
@@ -131,7 +133,7 @@ export default function PhoneLoginForm() {
       if (response.data.user.role === "admin") {
         router.push("/admin");
       } else {
-        router.push("/");
+        router.push(redirectTo || "/");
       }
     } catch (error: any) {
       console.log(error);

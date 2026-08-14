@@ -39,9 +39,14 @@ export default function ContactinfoCard() {
           <div>
             <h3 className="text-xl font-semibold text-white">Email</h3>
 
-            <p className="mt-1 break-all text-lg text-gray-400">
-              contact@karzone.com
-            </p>
+            <a
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=contact@drivego.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 block break-all text-lg text-gray-400 transition hover:text-orange-400"
+            >
+              contact@DriveGo.com
+            </a>
           </div>
         </div>
 
@@ -56,7 +61,7 @@ export default function ContactinfoCard() {
 
             <p className="mt-1 text-lg text-gray-400">Mon-Sat: 8AM-8PM</p>
 
-            <p className="text-lg text-gray-500">Sunday: 10AM-6PM</p>
+            <p className="text-lg text-gray-400">Sunday: 10AM-6PM</p>
           </div>
         </div>
       </div>

@@ -7,26 +7,15 @@ import {
   FaTachometerAlt,
   FaCheckCircle,
 } from "react-icons/fa";
-import { useRouter } from "next/navigation";
+import { useBookNow } from "@/hooks/useBookNow";
 
 type Props = {
   car: any;
 };
 
 export default function CarCard({ car }: Props) {
-  const router = useRouter();
-  
-  const handleBookNow = () => {
-    // Backend/Firebase aane ke baad yahi check replace hoga
-    const isLoggedIn = localStorage.getItem("token");
+  const handleBookNow = useBookNow(car._id);
 
-    if (!isLoggedIn) {
-      router.push("/login");
-      return;
-    }
-
-    router.push(`/cars/${car._id}`);
-  };
   return (
     <div
       className="
@@ -65,7 +54,7 @@ export default function CarCard({ car }: Props) {
           font-semibold
           "
         >
-          {car.price}
+          ₹{car.price?.toLocaleString("en-IN")}/day
         </div>
       </div>
 

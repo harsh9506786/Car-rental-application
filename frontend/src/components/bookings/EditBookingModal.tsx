@@ -21,9 +21,14 @@ interface Props {
   onUpdated: () => void;
 }
 
-const toDateInputValue = (iso: string) => new Date(iso).toISOString().split("T")[0];
+const toDateInputValue = (iso: string) =>
+  new Date(iso).toISOString().split("T")[0];
 
-export default function EditBookingModal({ booking, onClose, onUpdated }: Props) {
+export default function EditBookingModal({
+  booking,
+  onClose,
+  onUpdated,
+}: Props) {
   const { showToast } = useToast();
   const [form, setForm] = useState({
     pickupDate: "",
@@ -54,12 +59,20 @@ export default function EditBookingModal({ booking, onClose, onUpdated }: Props)
     if (!booking) return;
 
     if (!form.pickupDate || !form.returnDate) {
-      showToast("warning", "Missing Dates", "Please select both pickup and return dates.");
+      showToast(
+        "warning",
+        "Missing Dates",
+        "Please select both pickup and return dates.",
+      );
       return;
     }
 
     if (new Date(form.returnDate) < new Date(form.pickupDate)) {
-      showToast("warning", "Invalid Dates", "Return date cannot be before pickup date.");
+      showToast(
+        "warning",
+        "Invalid Dates",
+        "Return date cannot be before pickup date.",
+      );
       return;
     }
 
@@ -68,15 +81,11 @@ export default function EditBookingModal({ booking, onClose, onUpdated }: Props)
     try {
       const token = localStorage.getItem("token");
 
-      const res = await api.put(
-        `/api/bookings/${booking._id}`,
-        form,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const res = await api.put(`/api/bookings/${booking._id}`, form, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       showToast(
         res.data.type || "success",
@@ -127,13 +136,6 @@ export default function EditBookingModal({ booking, onClose, onUpdated }: Props)
                 <X size={20} />
               </button>
             </div>
-
-            {booking.status === "Confirmed" && (
-              <div className="mb-4 rounded-xl border border-orange-500/30 bg-orange-500/10 px-4 py-2.5 text-xs text-orange-300">
-                Changing dates will send this booking back to admin for
-                re-approval.
-              </div>
-            )}
 
             <div className="grid grid-cols-2 gap-3">
               <div>

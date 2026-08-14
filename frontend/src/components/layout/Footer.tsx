@@ -24,16 +24,16 @@ export default function Footer() {
         email,
       });
 
-      showToast(res.data.title, res.data.message, res.data.type);
+      showToast(res.data.type, res.data.title, res.data.message);
 
       if (res.data.type === "success") {
         setEmail("");
       }
     } catch (err: any) {
       showToast(
+        err.response?.data?.type || "error",
         err.response?.data?.title || "Error",
         err.response?.data?.message || "Something went wrong",
-        err.response?.data?.type || "error",
       );
     }
   };
@@ -124,21 +124,21 @@ export default function Footer() {
 
             <div className="mt-8 flex flex-col gap-5">
               <Link href="/" className="text-slate-400 hover:text-orange-400">
-                • Home
+                Home
               </Link>
 
               <Link
                 href="/cars"
                 className="text-slate-400 hover:text-orange-400"
               >
-                • Cars
+                Cars
               </Link>
 
               <Link
                 href="/contact"
                 className="text-slate-400 hover:text-orange-400"
               >
-                • Contact Us
+                Contact Us
               </Link>
             </div>
           </div>
@@ -166,7 +166,14 @@ export default function Footer() {
 
               <div className="flex gap-3">
                 <FaEnvelope className="text-orange-400" />
-                <p>info@drivego.com</p>
+                <a
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=info@drivego.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-orange-400 transition"
+                >
+                  info@drivego.com
+                </a>
               </div>
             </div>
 

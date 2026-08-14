@@ -1,12 +1,33 @@
 "use client";
 
 import { motion } from "framer-motion";
-
+import { useQuery } from "@tanstack/react-query";
 import { FaCarSide } from "react-icons/fa";
 import TestimonialCard from "./TestimonialCard";
-import { testimonials } from "./testimonials";
+import api from "@/lib/axios";
 
 export default function Testimonials() {
+  const fetchReviews = async () => {
+    const res = await api.get("/api/reviews?limit=12");
+    return res.data.reviews;
+  };
+
+  const { data: reviews = [] } = useQuery({
+    queryKey: ["reviews"],
+    queryFn: fetchReviews,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const testimonials = reviews.map((r: any) => ({
+    id: r._id,
+    name: r.user?.name || "Verified Renter",
+    role: "Verified Renter",
+    vehicle: r.car?.name || "DriveGo Fleet",
+    rating: r.rating,
+    avatar: (r.user?.name?.[0] || "D").toUpperCase(),
+    review: r.review,
+  }));
+
   const containerVariants = {
     hidden: {},
     visible: {
@@ -29,6 +50,16 @@ export default function Testimonials() {
       },
     },
   };
+
+  if (testimonials.length === 0) {
+    return null;
+  }
+
+  const shouldSlide = testimonials.length > 3;
+  const marqueeItems = shouldSlide
+    ? [...testimonials, ...testimonials]
+    : testimonials;
+
   return (
     <section className="pt-5 md:py-12">
       <div className="mx-auto max-w-7xl px-4">
@@ -88,42 +119,48 @@ export default function Testimonials() {
           text-slate-400
           "
           >
-            Hear from our valued customers about their journey with our premium
-            fleet
+            Hear from our valued customers about their journey with our
+            premium fleet
           </p>
         </motion.div>
 
-        {/* Cards */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          className="
-    mt-20
-    grid
-    grid-cols-1
-    gap-8
-    md:grid-cols-2
-    xl:grid-cols-3
-  "
-        >
-          {testimonials.map((item) => (
-            <motion.div
-              key={item.id}
-              variants={cardVariants}
-              whileHover={{
-                y: -10,
-                scale: 1.03,
-              }}
-              transition={{
-                duration: 0.3,
-              }}
-            >
-              <TestimonialCard item={item} />
-            </motion.div>
-          ))}
-        </motion.div>
+        {/* Static grid (3 or fewer reviews) */}
+        {!shouldSlide && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            className="mt-20 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3"
+          >
+            {testimonials.map((item: any) => (
+              <motion.div
+                key={item.id}
+                variants={cardVariants}
+                whileHover={{ y: -10, scale: 1.03 }}
+                transition={{ duration: 0.3 }}
+              >
+                <TestimonialCard item={item} />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Auto-sliding marquee (more than 3 reviews) */}
+        {shouldSlide && (
+          <div className="mt-20 overflow-x-auto sm:overflow-hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="animate-marquee flex w-max gap-5 px-4 sm:gap-8 sm:px-0">
+              {marqueeItems.map((item: any, index: number) => (
+                <div
+                  key={`${item.id}-${index}`}
+                  className="w-[260px] shrink-0 xs:w-[280px] sm:w-[360px]"
+                >
+                  <TestimonialCard item={item} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

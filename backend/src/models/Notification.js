@@ -14,12 +14,14 @@ const notificationSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: [
-        "booking",
-        "user",
-        "contact",
-      ],
+      enum: ["booking", "user", "contact"],
       default: "booking",
+    },
+
+    bookingId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Booking",
+      default: null,
     },
 
     isRead: {
@@ -32,7 +34,4 @@ const notificationSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model(
-  "Notification",
-  notificationSchema
-);
+export default mongoose.model("Notification", notificationSchema);
