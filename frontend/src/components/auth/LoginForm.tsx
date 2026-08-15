@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import api from "@/lib/axios";
@@ -11,6 +11,8 @@ import { useToast } from "@/context/ToastContext";
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const { showToast } = useToast();
 
   const [email, setEmail] = useState("");
@@ -39,7 +41,7 @@ export default function LoginForm() {
       if (response.data.user.role === "admin") {
         router.push("/admin");
       } else {
-        router.push("/");
+        router.push(redirectTo || "/");
       }
     } catch (error: any) {
       showToast(

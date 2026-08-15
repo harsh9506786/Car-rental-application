@@ -51,13 +51,34 @@ const bookingSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: [
-        "Pending",
-        "Confirmed",
-        "Completed",
-        "Cancelled",
-      ],
-      default: "Pending",
+      enum: ["Pending", "Confirmed", "Completed", "Cancelled"],
+      default: "Confirmed",
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: ["Unpaid", "Paid"],
+      default: "Unpaid",
+    },
+
+    paidAmount: {
+      type: Number,
+      default: 0,
+    },
+
+    couponApplied: {
+      type: String,
+      default: "",
+    },
+
+    razorpayOrderId: {
+      type: String,
+      default: "",
+    },
+
+    razorpayPaymentId: {
+      type: String,
+      default: "",
     },
 
     paymentStatus: {
@@ -88,7 +109,7 @@ const bookingSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export default mongoose.model("Booking", bookingSchema);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
 import api from "@/lib/axios";
@@ -10,6 +10,8 @@ import { useToast } from "@/context/ToastContext";
 
 export default function GoogleSignInButton() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -30,9 +32,9 @@ export default function GoogleSignInButton() {
       window.dispatchEvent(new Event("authChanged"));
 
       if (response.data.user.role === "admin") {
-        router.push("/admin");
+    router.push("/admin");
       } else {
-        router.push("/");
+        router.push(redirectTo || "/");
       }
     } catch (error: any) {
       console.log(error);

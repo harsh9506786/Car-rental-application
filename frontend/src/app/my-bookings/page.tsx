@@ -13,11 +13,15 @@ import {
   History,
   Clock,
   CreditCard,
+  Ban,
+  MessageSquarePlus,
+  CheckCircle2,
 } from "lucide-react";
 import api from "@/lib/axios";
 import BookingCardSkeleton from "@/components/bookings/BookingCardSkeleton";
 import EditBookingModal from "@/components/bookings/EditBookingModal";
 import PaymentModal from "@/components/bookings/PaymentModal";
+import ReviewModal from "@/components/bookings/ReviewModal";
 
 type Booking = {
   _id: string;
@@ -36,6 +40,7 @@ type Booking = {
   notes?: string;
   status: "Pending" | "Confirmed" | "Completed" | "Cancelled";
   paymentStatus: "Unpaid" | "Paid";
+  hasReview?: boolean;
 };
 
 const statusStyles: Record<string, string> = {
@@ -84,6 +89,10 @@ export default function MyBookingsPage() {
   const [tab, setTab] = useState<"active" | "history">("active");
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [payingBooking, setPayingBooking] = useState<Booking | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [reviewingBooking, setReviewingBooking] = useState<Booking | null>(
+    null,
+  );
 
   useEffect(() => {
     const t = localStorage.getItem("token");
@@ -134,6 +143,25 @@ export default function MyBookingsPage() {
 
   const handleUpdated = () => {
     queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+  };
+  const handleCancel = async (bookingId: string) => {
+    if (!confirm("Are you sure you want to cancel this booking?")) return;
+
+    setCancellingId(bookingId);
+
+    try {
+      await api.put(
+        `/api/bookings/${bookingId}/cancel`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setCancellingId(null);
+    }
   };
 
   return (
@@ -265,6 +293,42 @@ export default function MyBookingsPage() {
                             Edit
                           </button>
                         )}
+
+                      {tab === "active" && booking.status === "Confirmed" && (
+                        <button
+                          onClick={() => handleCancel(booking._id)}
+                          disabled={cancellingId === booking._id}
+                          title="Cancel booking"
+                          className="flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 transition hover:bg-red-500/20 disabled:opacity-60"
+                        >
+                          <Ban size={13} />
+                          {cancellingId === booking._id
+                            ? "Cancelling..."
+                            : "Cancel"}
+                        </button>
+                      )}
+
+                      {tab === "history" &&
+                        booking.status === "Completed" &&
+                        !booking.hasReview && (
+                          <button
+                            onClick={() => setReviewingBooking(booking)}
+                            title="Leave feedback"
+                            className="flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1.5 text-xs font-semibold text-orange-400 transition hover:bg-orange-500/20"
+                          >
+                            <MessageSquarePlus size={13} />
+                            Leave Feedback
+                          </button>
+                        )}
+
+                      {tab === "history" &&
+                        booking.status === "Completed" &&
+                        booking.hasReview && (
+                          <span className="flex items-center gap-1.5 rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1.5 text-xs font-semibold text-green-400">
+                            <CheckCircle2 size={13} />
+                            Reviewed
+                          </span>
+                        )}
                     </div>
                   </div>
 
@@ -321,6 +385,12 @@ export default function MyBookingsPage() {
         booking={payingBooking}
         onClose={() => setPayingBooking(null)}
         onPaid={handleUpdated}
+      />
+
+      <ReviewModal
+        booking={reviewingBooking}
+        onClose={() => setReviewingBooking(null)}
+        onSubmitted={handleUpdated}
       />
     </main>
   );

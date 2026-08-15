@@ -30,18 +30,18 @@ export default function TestimonialCard({ item }: Props) {
         absolute
         right-0
         top-0
-        h-14
-        w-14
+        h-8
+        w-8
         bg-orange-900/60
         clip-path-triangle
         "
       />
 
       {/* Top */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pr-2">
         <FaQuoteLeft className="text-4xl text-orange-400" />
 
-        <div className="flex gap-1">
+        <div className="mt-3 flex gap-1">
           {[...Array(item.rating)].map((_, i) => (
             <FaStar
               key={i}

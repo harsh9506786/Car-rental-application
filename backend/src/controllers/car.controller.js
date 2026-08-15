@@ -1,15 +1,49 @@
 import Car from "../models/Car.js";
+import redisClient from "../config/redis.js";
+
+const CARS_CACHE_KEY = "cars:all";
+const CACHE_TTL_SECONDS = 300; // 5 minutes
+
+// Helper: clear the cars cache whenever the fleet changes
+const invalidateCarsCache = async () => {
+  if (redisClient.isOpen) {
+    try {
+      await redisClient.del(CARS_CACHE_KEY);
+    } catch (error) {
+      console.log("[redis] Failed to invalidate cache:", error.message);
+    }
+  }
+};
 
 // GET ALL CARS
 export const getCars = async (req, res) => {
   try {
+    // Try serving from cache first
+    if (redisClient.isOpen) {
+      const cached = await redisClient.get(CARS_CACHE_KEY);
+      if (cached) {
+        return res.status(200).json(JSON.parse(cached));
+      }
+    }
+
     const cars = await Car.find();
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       count: cars.length,
       cars,
-    });
+    };
+
+    // Populate cache for next request (fire-and-forget, don't block response)
+    if (redisClient.isOpen) {
+      redisClient
+        .setEx(CARS_CACHE_KEY, CACHE_TTL_SECONDS, JSON.stringify(responseData))
+        .catch((err) =>
+          console.log("[redis] Failed to set cache:", err.message),
+        );
+    }
+
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -61,6 +95,8 @@ export const createCar = async (req, res) => {
       tags: JSON.parse(req.body.tags),
     });
 
+    await invalidateCarsCache();
+
     res.status(201).json({
       success: true,
       car,
@@ -91,14 +127,10 @@ export const updateCar = async (req, res) => {
       updateData.tags = JSON.parse(updateData.tags);
     }
 
-    const car = await Car.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const car = await Car.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!car) {
       return res.status(404).json({
@@ -106,6 +138,8 @@ export const updateCar = async (req, res) => {
         message: "Car not found",
       });
     }
+
+    await invalidateCarsCache();
 
     res.json({
       success: true,
@@ -131,6 +165,8 @@ export const deleteCar = async (req, res) => {
     }
 
     await car.deleteOne();
+
+    await invalidateCarsCache();
 
     res.json({
       success: true,

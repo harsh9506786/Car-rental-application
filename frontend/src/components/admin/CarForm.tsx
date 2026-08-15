@@ -7,6 +7,7 @@ import InputField from "@/components/admin/InputField";
 import TextareaField from "@/components/admin/TextareaField";
 import ImageUpload from "@/components/admin/ImageUpload";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/context/ToastContext";
 
 interface Props {
   mode: "create" | "edit";
@@ -14,6 +15,9 @@ interface Props {
 }
 
 export default function CarForm({ mode, initialData }: Props) {
+  const { showToast } = useToast();
+  const router = useRouter();
+
   const [form, setForm] = useState({
     name: initialData?.name || "",
     brand: initialData?.brand || "",
@@ -96,35 +100,44 @@ export default function CarForm({ mode, initialData }: Props) {
       let response;
 
       if (mode === "create") {
-        response = await api.post(
-          "/api/cars",
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
+        response = await api.post("/api/cars", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
           },
-        );
+        });
       } else {
-        response = await api.put(
-          `/api/cars/${initialData._id}`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
+        response = await api.put(`/api/cars/${initialData._id}`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
           },
-        );
+        });
       }
 
       console.log(response.data);
-    } catch (error) {
+
+      showToast(
+        "success",
+        mode === "create" ? "Car Added" : "Car Updated",
+        mode === "create"
+          ? "The new car has been added to your fleet."
+          : "Car details have been updated successfully.",
+      );
+
+      router.push("/admin/cars");
+    } catch (error: any) {
       console.log(error);
+
+      showToast(
+        "error",
+        mode === "create" ? "Could Not Add Car" : "Could Not Update Car",
+        error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
     }
   };
-  const router = useRouter();
+
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-8">

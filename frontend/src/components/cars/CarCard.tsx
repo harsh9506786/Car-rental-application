@@ -1,26 +1,17 @@
 "use client";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { Users, Fuel, Gauge, ShieldCheck, ArrowRight } from "lucide-react";
+import { useBookNow } from "@/hooks/useBookNow";
 
 interface Props {
   car: any;
 }
 
 export default function CarCard({ car }: Props) {
-  const router = useRouter();
-  const handleBookNow = () => {
-    const token = localStorage.getItem("token");
+  const handleBookNow = useBookNow(car._id);
 
-    if (!token) {
-      router.push(`/login?redirect=/cars/${car._id}`);
-      return;
-    }
-
-    router.push(`/cars/${car._id}`);
-  };
   return (
-    <div className="group overflow-hidden rounded-2xl border border-gray-800 bg-[#070b14] transition duration-300 hover:border-orange-500 hover:shadow-[0_0_25px_rgba(255,140,0,0.3)]">
+    <div className="group overflow-hidden rounded-2xl border border-gray-800 bg-[#070b14] transition duration-300 hover:shadow-[0_0_25px_rgba(255,140,0,0.3)]">
       <div className="relative h-60 overflow-hidden">
         <Image
           src={car.images?.[0] || "/placeholder-car.png"}
@@ -67,7 +58,7 @@ export default function CarCard({ car }: Props) {
 
         <button
           onClick={handleBookNow}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 py-4 font-semibold text-white transition hover:scale-105"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-400 py-4 font-semibold text-white transition hover:scale-105 cursor-pointer"
         >
           Book Now
           <ArrowRight size={20} />

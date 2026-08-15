@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaUser } from "react-icons/fa";
 import { HiBars3, HiXMark } from "react-icons/hi2";
-import api from "@/lib/axios";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
   {
@@ -24,9 +24,9 @@ const navLinks = [
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
-
   useEffect(() => {
     const loadUser = () => {
       const storedUser = localStorage.getItem("user");
@@ -92,24 +92,27 @@ tracking-tight
         {/* Desktop Nav */}
         <div className="hidden md:flex flex-1 items-center justify-center">
           <ul className="flex items-center gap-10">
-            {navLinks.map((item, index) => (
-              <li key={item.href} className="flex items-center">
-                <Link
-                  href={item.href}
-                  className="group relative px-5 py-2 text-md font-medium text-white
-hover:text-orange-400 transition-all duration-300 hover:text-orange-400"
-                >
-                  {item.label}
+            {navLinks.map((item, index) => {
+              const isActive = pathname === item.href;
 
-                  {/* Animated Underline */}
-                  <span
-                    className="
+              return (
+                <li key={item.href} className="flex items-center">
+                  <Link
+                    href={item.href}
+                    className={`group relative px-5 py-2 text-md font-medium transition-all duration-300 hover:text-orange-400 ${
+                      isActive ? "text-orange-400" : "text-white"
+                    }`}
+                  >
+                    {item.label}
+
+                    {/* Animated Underline */}
+                    <span
+                      className={`
     absolute
     left-1/2
     -translate-x-1/2
     bottom-0
     h-[2px]
-    w-0
     rounded-full
     bg-gradient-to-r
     from-orange-400
@@ -117,27 +120,31 @@ hover:text-orange-400 transition-all duration-300 hover:text-orange-400"
     transition-all
     duration-300
     group-hover:w-8
-  "
-                  />
-                </Link>
-              </li>
-            ))}
+    ${isActive ? "w-8" : "w-0"}
+  `}
+                    />
+                  </Link>
+                </li>
+              );
+            })}
             {user && (
               <li>
                 <Link
                   href="/my-bookings"
-                  className="group relative px-5 py-2 text-md font-medium text-white
-hover:text-orange-400 transition-all duration-300 hover:text-orange-400"
+                  className={`group relative px-5 py-2 text-md font-medium transition-all duration-300 hover:text-orange-400 ${
+                    pathname === "/my-bookings"
+                      ? "text-orange-400"
+                      : "text-white"
+                  }`}
                 >
                   My Bookings
                   <span
-                    className="
+                    className={`
     absolute
     left-1/2
     -translate-x-1/2
     bottom-0
     h-[2px]
-    w-0
     rounded-full
     bg-gradient-to-r
     from-orange-400
@@ -145,7 +152,8 @@ hover:text-orange-400 transition-all duration-300 hover:text-orange-400"
     transition-all
     duration-300
     group-hover:w-8
-  "
+    ${pathname === "/my-bookings" ? "w-8" : "w-0"}
+  `}
                   />
                 </Link>
               </li>
@@ -236,11 +244,11 @@ backdrop-blur-2xl
                 onClick={handleLogout}
                 className="
  
-rounded-xl
+rounded-full
 border
 border-white/10
 bg-white/5
-px-6
+px-12
 py-3
 cursor-pointer
 font-medium
@@ -259,11 +267,11 @@ hover:text-white
               href="/login"
               prefetch
               className="
-rounded-xl
+rounded-full
 border
 border-white/10
 bg-white/5
-px-6
+px-12
 py-3
 font-medium
 text-white

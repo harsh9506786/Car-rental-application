@@ -7,13 +7,10 @@ import {
   getDashboardStats,
   getRecentBookings,
   getRecentUsers,
-  updateBookingStatus,
   getAllUsers,
   getAllBookings,
   getBookingHistory,
 } from "../controllers/admin.controller.js";
-
-
 
 const router = express.Router();
 
@@ -25,7 +22,6 @@ router.get("/recent-users", protect, adminOnly, getRecentUsers);
 // Bookings
 router.get("/bookings", protect, adminOnly, getAllBookings);
 router.get("/bookings/history", protect, adminOnly, getBookingHistory);
-router.put("/booking/:id/status", protect, adminOnly, updateBookingStatus);
 
 // Users
 router.get("/users", protect, adminOnly, getAllUsers);

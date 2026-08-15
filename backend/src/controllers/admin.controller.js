@@ -2,7 +2,6 @@ import Car from "../models/Car.js";
 import Booking from "../models/Booking.js";
 import User from "../models/User.js";
 import { autoExpireBookings } from "../utils/autoExpireBookings.js";
-import { sendBookingConfirmed } from "../services/whatsapp.service.js";
 
 const ACTIVE_STATUSES = ["Pending", "Confirmed"];
 const HISTORY_STATUSES = ["Completed", "Cancelled"];
@@ -52,6 +51,7 @@ export const getRecentBookings = async (req, res) => {
     });
   }
 };
+
 export const getRecentUsers = async (req, res) => {
   try {
     const users = await User.find()
@@ -62,35 +62,6 @@ export const getRecentUsers = async (req, res) => {
     res.json({
       success: true,
       users,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-export const updateBookingStatus = async (req, res) => {
-  try {
-    const booking = await Booking.findByIdAndUpdate(
-      req.params.id,
-      {
-        status: req.body.status,
-      },
-      { new: true },
-    ).populate("car", "name brand");
-
-    if (booking && req.body.status === "Confirmed") {
-      sendBookingConfirmed({
-        phone: booking.phone,
-        carName: booking.car?.name || "your car",
-        pickupDate: booking.pickupDate,
-      });
-    }
-
-    res.json({
-      success: true,
-      booking,
     });
   } catch (error) {
     res.status(500).json({
@@ -148,9 +119,7 @@ export const getBookingHistory = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find()
-      .select("-password")
-      .sort({ createdAt: -1 });
+    const users = await User.find().select("-password").sort({ createdAt: -1 });
 
     res.json({
       success: true,

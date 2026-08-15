@@ -2,6 +2,7 @@
 
 import { Bell, Menu, Search } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function Topbar({ setSidebarOpen }: Props) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
@@ -81,6 +83,15 @@ export default function Topbar({ setSidebarOpen }: Props) {
       } catch (err) {
         console.log(err);
       }
+    }
+  };
+
+  // Notification pe click hote hi related booking page pe le jao
+  const handleNotificationClick = (item: any) => {
+    setOpen(false);
+
+    if (item.type === "booking" && item.bookingId) {
+      router.push("/admin/bookings");
     }
   };
 
@@ -257,14 +268,16 @@ xl:w-[520px]
                     notifications.map((item: any) => (
                       <div
                         key={item._id}
-                        className="
+                        onClick={() => handleNotificationClick(item)}
+                        className={`
               border-b
               border-slate-700
               px-4
               py-4
               overflow-hidden
               hover:bg-slate-800
-            "
+              ${item.type === "booking" && item.bookingId ? "cursor-pointer" : ""}
+            `}
                       >
                         <h4 className="font-semibold text-white">
                           {item.title}

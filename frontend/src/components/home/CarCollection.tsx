@@ -1,38 +1,35 @@
 "use client";
 
-import CarCard from "./CarCard";
-import { useState, useEffect } from "react";
+import CarCard from "./FeaturedCarCard";
+import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import { FaCarSide } from "react-icons/fa";
 import CarCardSkeleton from "./CarCardSkeleton";
 
-export default function CarCollection() {
-  interface Car {
-    _id: string;
-    name: string;
-    images: string[];
-    price: number;
-    category: string;
-    seats: number;
-    fuel: string;
-    mileage: string;
-    transmission: string;
-  }
-  const [cars, setCars] = useState<Car[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Car {
+  _id: string;
+  name: string;
+  images: string[];
+  price: number;
+  category: string;
+  seats: number;
+  fuel: string;
+  mileage: string;
+  transmission: string;
+}
 
-  useEffect(() => {
-    fetchCars();
-  }, []);
+export default function CarCollection() {
   const fetchCars = async () => {
-    try {
-      const res = await api.get("/api/cars");
-      setCars(res.data.cars);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
+    const res = await api.get("/api/cars");
+    return res.data.cars as Car[];
   };
+
+  const { data: cars = [], isLoading: loading } = useQuery({
+    queryKey: ["cars"],
+    queryFn: fetchCars,
+    staleTime: 1000 * 60 * 5,
+  });
+
   return (
     <section className="py-24">
       <div className="mx-auto max-w-7xl px-4">
@@ -68,6 +65,14 @@ export default function CarCollection() {
           >
             Luxury Car Collection
           </h2>
+          {/* Divider */}
+          <div className="mt-4 flex items-center justify-center gap-4">
+            <div className="h-[2px] w-20 bg-orange-400" />
+
+            <FaCarSide className="text-orange-400" />
+
+            <div className="h-[2px] w-20 bg-orange-400" />
+          </div>
 
           <p
             className="

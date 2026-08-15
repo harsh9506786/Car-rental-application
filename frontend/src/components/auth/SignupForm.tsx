@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import api from "@/lib/axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import FullScreenLoader from "@/components/ui/FullScreenLoader";
 import { useToast } from "@/context/ToastContext";
 
@@ -12,6 +12,8 @@ export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const { showToast } = useToast();
 
   const [name, setName] = useState("");
@@ -24,7 +26,11 @@ export default function SignupForm() {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      showToast("warning", "Passwords Don't Match", "Please make sure both passwords are the same.");
+      showToast(
+        "warning",
+        "Passwords Don't Match",
+        "Please make sure both passwords are the same.",
+      );
       return;
     }
 
@@ -45,13 +51,14 @@ export default function SignupForm() {
       if (response.data.user.role === "admin") {
         router.push("/admin");
       } else {
-        router.push("/");
+        router.push(redirectTo || "/");
       }
     } catch (error: any) {
       showToast(
         "error",
         "Signup Failed",
-        error.response?.data?.message || "Something went wrong. Please try again.",
+        error.response?.data?.message ||
+          "Something went wrong. Please try again.",
       );
     } finally {
       setLoading(false);
