@@ -29,6 +29,7 @@ export default function InputField({
         onChange={onChange}
         placeholder={placeholder}
         className="
+          w-full
           rounded-xl
           border
           border-slate-700

@@ -1,7 +1,7 @@
 "use client";
 
 import api from "@/lib/axios";
-import TableSkeleton from "@/components/admin/TableSkeleton";
+import Spinner from "@/components/ui/Spinner";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, History } from "lucide-react";
 import { useState } from "react";
@@ -71,7 +71,7 @@ export default function BookingsPage() {
       </div>
 
       {isLoading ? (
-        <TableSkeleton rows={6} columns={5} />
+        <Spinner />
       ) : bookings.length === 0 ? (
         <div className="rounded-2xl bg-[#111827] py-16 text-center text-gray-500">
           {tab === "active"

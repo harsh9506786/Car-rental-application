@@ -2,7 +2,7 @@
 
 import api from "@/lib/axios";
 import StatCard from "@/components/admin/StatCard";
-import DashboardSkeleton from "@/components/admin/DashboardSkeleton";
+import Spinner from "@/components/ui/Spinner";
 import { Car, CalendarDays, Users, IndianRupee } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
   });
 
   if (isLoading) {
-    return <DashboardSkeleton />;
+    return <Spinner />;
   }
 
   const stats = data?.stats;

@@ -162,7 +162,7 @@ export default function CarForm({ mode, initialData }: Props) {
         p-8
       "
       >
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid min-w-0 gap-6 md:grid-cols-2">
           <InputField
             label="Car Name"
             name="name"
@@ -197,7 +197,7 @@ export default function CarForm({ mode, initialData }: Props) {
           />
         </div>
 
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <div className="mt-6 grid min-w-0 gap-6 md:grid-cols-2">
           <ImageUpload preview={preview} onChange={handleImageChange} />
 
           <InputField
@@ -233,7 +233,7 @@ export default function CarForm({ mode, initialData }: Props) {
             placeholder="15 km/l"
           />
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid min-w-0 gap-6 md:grid-cols-2">
             <InputField
               label="Manufacturing Year"
               name="year"

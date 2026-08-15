@@ -3,7 +3,7 @@
 import api from "@/lib/axios";
 import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
-import TableSkeleton from "./TableSkeleton";
+import Spinner from "@/components/ui/Spinner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function CarTable() {
@@ -40,7 +40,7 @@ export default function CarTable() {
   };
 
   if (isLoading) {
-    return <TableSkeleton rows={6} />;
+    return <Spinner />;
   }
 
   if (cars.length === 0) {

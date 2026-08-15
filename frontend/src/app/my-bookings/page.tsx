@@ -259,7 +259,7 @@ export default function MyBookingsPage() {
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span
                         className={`rounded-full border px-4 py-1.5 text-xs font-semibold ${
                           statusStyles[booking.status] ||

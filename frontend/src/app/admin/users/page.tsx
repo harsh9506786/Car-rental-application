@@ -1,7 +1,7 @@
 "use client";
 
 import api from "@/lib/axios";
-import TableSkeleton from "@/components/admin/TableSkeleton";
+import Spinner from "@/components/ui/Spinner";
 import { useQuery } from "@tanstack/react-query";
 
 export default function UsersPage() {
@@ -20,7 +20,7 @@ export default function UsersPage() {
   });
 
   if (isLoading) {
-    return <TableSkeleton rows={6} columns={5} />;
+    return <Spinner />;
   }
 
   return (

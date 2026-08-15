@@ -21,7 +21,7 @@ export default function TextareaField({
         {label}
       </label>
 
-      <textarea
+<textarea
         id={name}
         name={name}
         rows={rows}
@@ -29,6 +29,7 @@ export default function TextareaField({
         onChange={onChange}
         placeholder={placeholder}
         className="
+          w-full
           resize-none
           rounded-xl
           border
