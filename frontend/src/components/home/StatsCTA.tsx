@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useQuery } from "@tanstack/react-query";
 import CountUp from "react-countup";
 import { useRouter } from "next/navigation";
+import api from "@/lib/axios";
 
 export default function StatsCTA() {
   const router = useRouter();
@@ -16,63 +18,32 @@ export default function StatsCTA() {
       router.push("/login");
     }
   };
+
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.3,
   });
 
-  // const leftVariants = {
-  //   hidden: {
-  //     opacity: 0,
-  //     x: -80,
-  //   },
-  //   visible: {
-  //     opacity: 1,
-  //     x: 0,
-  //     transition: {
-  //       duration: 0.8,
-  //       staggerChildren: 0.15,
-  //     },
-  //   },
-  // };
+  const fetchStats = async () => {
+    const res = await api.get("/api/stats");
+    return res.data.stats;
+  };
 
-  // const itemVariants = {
-  //   hidden: {
-  //     opacity: 0,
-  //     y: 40,
-  //   },
-  //   visible: {
-  //     opacity: 1,
-  //     y: 0,
-  //     transition: {
-  //       duration: 0.5,
-  //     },
-  //   },
-  // };
-
-  // const rightVariants = {
-  //   hidden: {
-  //     opacity: 0,
-  //     x: 80,
-  //   },
-  //   visible: {
-  //     opacity: 1,
-  //     x: 0,
-  //     transition: {
-  //       duration: 0.8,
-  //     },
-  //   },
-  // };
+  const { data: liveStats } = useQuery({
+    queryKey: ["public-stats"],
+    queryFn: fetchStats,
+    staleTime: 1000 * 60 * 5,
+  });
 
   const stats = [
     {
-      end: 10,
-      suffix: "K+",
+      end: liveStats?.totalBookings ?? 0,
+      suffix: "+",
       label: "Happy Customers",
       color: "text-cyan-400",
     },
     {
-      end: 250,
+      end: liveStats?.totalCars ?? 0,
       suffix: "+",
       label: "Luxury Vehicles",
       color: "text-yellow-400",
@@ -84,9 +55,9 @@ export default function StatsCTA() {
       color: "text-violet-400",
     },
     {
-      end: 50,
+      end: liveStats?.totalLocations ?? 0,
       suffix: "+",
-      label: "Locations",
+      label: "Pickup Locations",
       color: "text-emerald-400",
     },
   ];
@@ -96,7 +67,6 @@ export default function StatsCTA() {
       <div className="mx-auto max-w-7xl">
         {/* Stats */}
         <div
-         
           className="
 rounded-[32px]
 border
@@ -112,8 +82,10 @@ sm:mx-0
         >
           <div className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-10 text-center md:grid-cols-4">
             {stats.map((item) => (
-              <div key={item.label} >
-                <h3 className={`text-3xl sm:text-4xl md:text-5xl font-bold ${item.color}`}>
+              <div key={item.label}>
+                <h3
+                  className={`text-3xl sm:text-4xl md:text-5xl font-bold ${item.color}`}
+                >
                   {inView && <CountUp end={item.end} duration={2} />}
                   {item.suffix}
                 </h3>
@@ -126,7 +98,6 @@ sm:mx-0
 
         {/* CTA */}
         <motion.div
-          
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
           className="relative mt-12 overflow-hidden rounded-[40px]"
