@@ -12,6 +12,7 @@ import notificationRoutes from "./routes/notification.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import couponRoutes from "./routes/coupon.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
+import statsRoutes from "./routes/stats.routes.js";
 
 const app = express();
 
@@ -49,5 +50,6 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/coupon", couponRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/stats", statsRoutes);
 
 export default app;
