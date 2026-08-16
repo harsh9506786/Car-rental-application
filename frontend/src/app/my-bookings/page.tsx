@@ -18,7 +18,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import api from "@/lib/axios";
-import BookingCardSkeleton from "@/components/bookings/BookingCardSkeleton";
+import Spinner from "@/components/ui/Spinner";
 import EditBookingModal from "@/components/bookings/EditBookingModal";
 import PaymentModal from "@/components/bookings/PaymentModal";
 import ReviewModal from "@/components/bookings/ReviewModal";
@@ -197,13 +197,7 @@ export default function MyBookingsPage() {
           </button>
         </div>
 
-        {isLoading && (
-          <div className="space-y-5">
-            <BookingCardSkeleton />
-            <BookingCardSkeleton />
-            <BookingCardSkeleton />
-          </div>
-        )}
+        {isLoading && <Spinner />}
 
         {!isLoading && isError && (
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-400">
