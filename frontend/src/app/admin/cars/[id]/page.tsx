@@ -1,48 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 
 import CarForm from "@/components/admin/CarForm";
+import Spinner from "@/components/ui/Spinner";
 
 export default function EditCarPage() {
   const { id } = useParams();
 
-  const [car, setCar] = useState<any>(null);
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchCar();
-  }, []);
-
   const fetchCar = async () => {
-    try {
-      const res = await api.get(
-        `/api/cars/${id}`
-      );
-
-      setCar(res.data.car);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
+    const res = await api.get(`/api/cars/${id}`);
+    return res.data.car;
   };
 
-  if (loading) {
-    return (
-      <div className="text-white">
-        Loading...
-      </div>
-    );
+  const { data: car, isLoading } = useQuery({
+    queryKey: ["car", id],
+    queryFn: fetchCar,
+    enabled: !!id,
+  });
+
+  if (isLoading) {
+    return <Spinner />;
   }
 
-  return (
-    <CarForm
-      mode="edit"
-      initialData={car}
-    />
-  );
+  return <CarForm mode="edit" initialData={car} />;
 }
