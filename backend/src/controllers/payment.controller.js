@@ -141,10 +141,12 @@ export const verifyPayment = async (req, res) => {
     }
 
     const razorpayOrder = await razorpay.orders.fetch(razorpay_order_id);
+    const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
 
     booking.paymentStatus = "Paid";
     booking.paidAmount = Number(razorpayOrder.amount) / 100;
     booking.razorpayPaymentId = razorpay_payment_id;
+    booking.paymentMethod = paymentDetails.method || "unknown";
     await booking.save();
 
     await Notification.create({

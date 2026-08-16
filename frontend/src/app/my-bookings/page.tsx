@@ -16,6 +16,7 @@ import {
   Ban,
   MessageSquarePlus,
   CheckCircle2,
+  Check,
 } from "lucide-react";
 import api from "@/lib/axios";
 import Spinner from "@/components/ui/Spinner";
@@ -274,6 +275,15 @@ export default function MyBookingsPage() {
                             <CreditCard size={13} />
                             Pay Now
                           </button>
+                        )}
+
+                      {tab === "active" &&
+                        booking.status === "Confirmed" &&
+                        booking.paymentStatus === "Paid" && (
+                          <span className="flex items-center gap-1.5 rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1.5 text-xs font-semibold text-green-400">
+                            <Check size={13} />
+                            Paid
+                          </span>
                         )}
 
                       {tab === "active" &&

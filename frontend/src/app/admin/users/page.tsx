@@ -58,11 +58,7 @@ export default function UsersPage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 border-t border-gray-800 pt-3 text-sm">
-                  <div>
-                    <p className="text-gray-500">Phone</p>
-                    <p className="text-gray-300">{user.phone || "-"}</p>
-                  </div>
+                <div className="border-t border-gray-800 pt-3 text-sm">
                   <div>
                     <p className="text-gray-500">Joined</p>
                     <p className="text-gray-300">
@@ -81,7 +77,6 @@ export default function UsersPage() {
                 <tr className="border-b border-gray-700 text-gray-400">
                   <th className="pb-4">Name</th>
                   <th className="pb-4">Email</th>
-                  <th className="pb-4">Phone</th>
                   <th className="pb-4">Role</th>
                   <th className="pb-4">Joined</th>
                 </tr>
@@ -91,7 +86,6 @@ export default function UsersPage() {
                   <tr key={user._id} className="border-b border-gray-800">
                     <td className="py-4 text-white">{user.name}</td>
                     <td className="py-4 text-gray-300">{user.email}</td>
-                    <td className="py-4 text-gray-300">{user.phone || "-"}</td>
                     <td className="py-4">
                       <span
                         className={`rounded-full px-3 py-1 text-sm font-medium ${

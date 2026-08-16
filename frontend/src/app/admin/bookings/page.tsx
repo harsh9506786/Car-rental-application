@@ -96,14 +96,25 @@ export default function BookingsPage() {
                       {booking.car?.name}
                     </p>
                   </div>
-                  <span
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                      statusStyles[booking.status] ||
-                      "border border-gray-600 bg-gray-500/10 text-gray-300"
-                    }`}
-                  >
-                    {booking.status}
-                  </span>
+                  <div className="flex flex-col items-end gap-1.5">
+                    <span
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                        statusStyles[booking.status] ||
+                        "border border-gray-600 bg-gray-500/10 text-gray-300"
+                      }`}
+                    >
+                      {booking.status}
+                    </span>
+                    <span
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold ${
+                        booking.paymentStatus === "Paid"
+                          ? "border border-green-500/30 bg-green-500/10 text-green-400"
+                          : "border border-yellow-500/30 bg-yellow-500/10 text-yellow-400"
+                      }`}
+                    >
+                      {booking.paymentStatus || "Unpaid"}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 border-t border-gray-800 pt-3 text-sm">
@@ -134,6 +145,7 @@ export default function BookingsPage() {
                   <th className="pb-4">Pickup</th>
                   <th className="pb-4">Return</th>
                   <th className="pb-4">Status</th>
+                  <th className="pb-4">Payment</th>
                 </tr>
               </thead>
               <tbody>
@@ -157,6 +169,17 @@ export default function BookingsPage() {
                         }`}
                       >
                         {booking.status}
+                      </span>
+                    </td>
+                    <td className="py-4">
+                      <span
+                        className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                          booking.paymentStatus === "Paid"
+                            ? "border border-green-500/30 bg-green-500/10 text-green-400"
+                            : "border border-yellow-500/30 bg-yellow-500/10 text-yellow-400"
+                        }`}
+                      >
+                        {booking.paymentStatus || "Unpaid"}
                       </span>
                     </td>
                   </tr>

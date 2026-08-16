@@ -67,7 +67,11 @@ export default function AdminDashboard() {
           value={stats?.totalUsers?.toString() ?? "0"}
           icon={Users}
         />
-        <StatCard title="Revenue" value="₹0" icon={IndianRupee} />
+        <StatCard
+          title="Revenue"
+          value={`₹${(stats?.totalRevenue ?? 0).toLocaleString("en-IN")}`}
+          icon={IndianRupee}
+        />
       </div>
 
       <div className="mt-8 rounded-2xl bg-[#111827] p-4 sm:p-6">

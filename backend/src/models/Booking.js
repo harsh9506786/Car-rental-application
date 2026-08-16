@@ -106,6 +106,10 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    paymentMethod: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,

@@ -14,12 +14,19 @@ export const getDashboardStats = async (req, res) => {
     const totalBookings = await Booking.countDocuments();
     const totalUsers = await User.countDocuments();
 
+    const revenueResult = await Booking.aggregate([
+      { $match: { paymentStatus: "Paid" } },
+      { $group: { _id: null, total: { $sum: "$paidAmount" } } },
+    ]);
+    const totalRevenue = revenueResult[0]?.total || 0;
+
     res.json({
       success: true,
       stats: {
         totalCars,
         totalBookings,
         totalUsers,
+        totalRevenue,
       },
     });
   } catch (error) {

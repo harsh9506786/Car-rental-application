@@ -9,8 +9,9 @@ import {
   getRecentUsers,
   getAllUsers,
   getAllBookings,
-  getBookingHistory,
+  getBookingHistory
 } from "../controllers/admin.controller.js";
+ import { getEarnings } from "../controllers/earnings.controller.js";
 
 const router = express.Router();
 
@@ -25,5 +26,6 @@ router.get("/bookings/history", protect, adminOnly, getBookingHistory);
 
 // Users
 router.get("/users", protect, adminOnly, getAllUsers);
+router.get("/earnings", protect, adminOnly, getEarnings);
 
 export default router;

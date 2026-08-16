@@ -8,6 +8,7 @@ import {
   Car,
   CalendarDays,
   Users,
+  Wallet,
   LogOut,
   ArrowLeft,
   X,
@@ -39,12 +40,14 @@ const menuItems = [
     href: "/admin/users",
     icon: Users,
   },
+  {
+    name: "Earnings",
+    href: "/admin/earnings",
+    icon: Wallet,
+  },
 ];
 
-export default function Sidebar({
-  sidebarOpen,
-  setSidebarOpen,
-}: Props) {
+export default function Sidebar({ sidebarOpen, setSidebarOpen }: Props) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -73,11 +76,7 @@ transition-all
 duration-300
 md:hidden
 
-${
-  sidebarOpen
-    ? "opacity-100 visible"
-    : "opacity-0 invisible"
-}
+${sidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"}
 `}
       />
 
@@ -100,17 +99,12 @@ duration-300
 md:fixed
 md:translate-x-0
 
-${
-  sidebarOpen
-    ? "translate-x-0"
-    : "-translate-x-full"
-}
+${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
 `}
       >
         {/* Header */}
 
         <div className="border-b border-slate-700 p-4.5 ">
-
           {/* Mobile Close */}
 
           <div className="mb-5 flex items-center justify-end md:hidden">
@@ -145,13 +139,9 @@ hover:text-white
             </Link>
 
             <div className="ml-3">
-              <h1 className="text-2xl font-bold text-white">
-                DriveGo
-              </h1>
+              <h1 className="text-2xl font-bold text-white">DriveGo</h1>
 
-              <p className="text-sm text-slate-400">
-                Admin Panel
-              </p>
+              <p className="text-sm text-slate-400">Admin Panel</p>
             </div>
           </div>
         </div>
@@ -171,9 +161,7 @@ hover:text-white
               <Link
                 key={item.name}
                 href={item.href}
-                onClick={() =>
-                  setSidebarOpen(false)
-                }
+                onClick={() => setSidebarOpen(false)}
                 className={`
 flex
 items-center
@@ -219,7 +207,6 @@ hover:text-white
 "
           >
             <LogOut size={20} />
-
             Logout
           </button>
         </div>
